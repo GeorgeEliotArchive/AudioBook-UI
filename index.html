@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- Other meta tags like viewport should come AFTER charset -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>George Eliot Archive</title>
+    <!-- Link Google Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Crimson+Text&display=swap">
+    <!-- Link External CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+      <div class="breadcrumb" id="breadcrumb">
+        <span onclick="goToIndex()">Index</span>
+      </div>
+      <!-- Initial Book List (Ordered by release)-->
+      <!-- The index # is based on Book Data in script.js and not related to release -->
+      <!-- Veil uses different function as it encoded very differently from others -->
+      <a href="#" onclick="loadBooks(2)">The Sad Fortunes of the Reverend Amos Barton</a>
+      <a href="#" onclick="loadBooks(1)">Mr. Gilfil's Love Story</a>
+      <a href="#" onclick="loadBooks(0)">Janet's Repentance</a>
+      <a href="#" onclick="loadBooks(5)">Adam Bede</a>
+      <a href="#" onclick="loadVeil(12)">Lifted Veil</a>
+      <a href="#" onclick="loadBooks(9)">The Mill on the Floss</a>
+      <a href="#" onclick="loadBooks(10)">Silas Marner</a>
+      <a href="#" onclick="loadBooks(8)">Romola</a>
+      <a href="#" onclick="loadBooks(4)">Brother Jacob</a>
+      <a href="#" onclick="loadBooks(7)">Felix Holt, The Radical</a>
+      <a href="#" onclick="loadBooks(11)">Middlemarch</a>
+      <a href="#" onclick="loadBooks(3)">Daniel Deronda</a>
+      <a href="#" onclick="loadBooks(6)">Impressions of Theophrastus Such</a>
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="main">
+      <button class="openbtn" onclick="toggleNav()">
+        <span class="arrow">➔</span>
+      </button>
+      <div id="mainContent">
+          <h2>Welcome to the George Eliot Archive</h2>
+          <h3>Select a work from the index menu (➔) to begin reading.</h3>
+      </div>
+    </div>
+
+    <!-- Audio Player Widget -->
+    <div id="audioWidget" class="audio-widget">
+      <div class="audio-widget-header" id="audioWidgetHeader">
+        <span class="drag-handle" title="Drag me">☰</span>
+        <div class="audio-info">
+          <span id="audioBookTitle">Book Title</span> -
+          <span id="audioChapterTitle">Chapter</span>
+        </div>
+        <button class="close-widget-btn" onclick="closeAudioWidget()" title="Close Player">×</button>
+      </div>
+      <div class="audio-widget-content">
+
+        <!-- ****** ADDED AUDIO SOURCE SELECTOR ****** -->
+        <div class="audio-source-selector">
+            <label for="audioSource">Source:</label>
+            <select id="audioSource" onchange="handleAudioSourceChange()" title="Select Audio Source">
+                <option value="librivox" selected>LibriVox</option>
+                <option value="tts">TTS</option>
+                <!-- Add more options later if needed -->
+            </select>
+        </div>
+        <!-- ***************************************** -->
+
+        <!-- Native HTML5 audio player -->
+        <audio id="audioPlayer" style="width: 100%;" controlslist="nodownload nofullscreen noremoteplayback"></audio>
+
+        <!-- Custom Controls -->
+        <div class="audio-controls">
+          <button id="rewindBtn" onclick="rewindAudio(10)" title="Rewind 10s">⏮</button>
+          <button id="playPauseBtn" onclick="togglePlayPause()" title="Play/Pause">▶</button>
+          <button id="fastForwardBtn" onclick="forwardAudio(10)" title="Forward 10s">⏭</button>
+        </div>
+        <div class="progress-container">
+           <input type="range" id="seekBar" value="0" title="Seek" style="width: 100%;">
+        </div>
+      </div>
+      <!-- Native resizing is handled by CSS `resize: both;` -->
+    </div>
+
+    <!-- Link External JavaScript Files -->
+    <script src="widget.js"></script>
+    <script src="script.js"></script> <!-- Or script.js if that's your filename -->
+
+</body>
+</html>

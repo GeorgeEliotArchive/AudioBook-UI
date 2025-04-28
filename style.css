@@ -1,0 +1,286 @@
+/* --- General Styles --- */
+body {
+  font-family: "Crimson Text", sans-serif;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+p {
+  line-height: 2;
+  text-indent: 30px;
+}
+
+/* --- Sidebar Styles --- */
+.sidebar {
+  font-family: "Crimson Text", sans-serif;
+  height: 100%;
+  width: 350px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #a41e34;
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition: transform 0.5s ease;
+  transform: translateX(-350px);
+  padding-top: 0;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+}
+
+.sidebar a {
+  padding: 12px 24px;
+  text-decoration: none;
+  font-size: 18px;
+  color: #ffffff;
+  display: block;
+  transition: background-color 0.3s, color 0.3s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar a:hover {
+  background-color: #d32d45;
+  color: #ffffff;
+}
+
+.sidebar a.active {
+    background-color: #8c1a2b;
+    font-weight: bold;
+}
+
+.breadcrumb {
+  color: white;
+  text-align: left;
+  padding: 16px 24px;
+  font-size: 20px;
+  background-color: #8c1a2b;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.breadcrumb span {
+    cursor: pointer;
+}
+.breadcrumb span:hover {
+    text-decoration: underline;
+}
+
+/* --- Toggle Button Styles --- */
+.openbtn {
+  font-size: 20px;
+  cursor: pointer;
+  background-color: #a41e34;
+  color: white;
+  padding: 0;
+  border: none;
+  position: fixed;
+  top: 5px;
+  left: 5px;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  line-height: 40px;
+  transition: transform 0.5s ease, background-color 0.3s;
+  z-index: 3;
+  border-radius: 3px;
+}
+
+.openbtn:hover {
+  background-color: #d32d45;
+}
+
+.arrow {
+  display: inline-block;
+  transform: rotate(0deg);
+  transition: transform 0.3s;
+}
+
+.sidebar.open {
+    transform: translateX(0px);
+}
+.openbtn.open {
+  transform: translateX(350px);
+}
+.openbtn.open .arrow {
+  transform: rotate(180deg);
+}
+
+/* --- Main Content Area Styles --- */
+#main {
+  transition: margin-left .5s ease;
+  padding: 16px;
+  padding-top: 60px;
+  margin-left: 0;
+}
+
+#main.shifted {
+    margin-left: 350px;
+}
+
+#mainContent {
+  line-height: 1.6;
+}
+
+/* --- Audio Widget Styling --- */
+.audio-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 320px;
+  min-width: 280px;
+  max-width: 600px;
+  height: auto;
+  min-height: 150px; /* Increased slightly for dropdown */
+  max-height: 450px;
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.25);
+  z-index: 1000;
+  display: none;
+  font-family: "Crimson Text", sans-serif;
+  resize: both;
+  overflow: auto;
+}
+
+.audio-widget-header {
+  padding: 6px 12px;
+  cursor: move;
+  background-color: #a41e34;
+  color: white;
+  border-bottom: 1px solid #8c1a2b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 32px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.audio-widget-header .drag-handle {
+  font-size: 18px;
+  margin-right: 10px;
+  cursor: grab;
+}
+.audio-widget-header:active {
+    cursor: grabbing;
+}
+
+.audio-widget-header .audio-info {
+  flex-grow: 1;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  padding: 0 5px;
+}
+
+.audio-widget-header .close-widget-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 5px;
+  line-height: 1;
+}
+.audio-widget-header .close-widget-btn:hover {
+  color: #f0f0f0;
+}
+
+.audio-widget-content {
+  padding: 10px 12px; /* Adjusted padding */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#audioPlayer {
+    width: 100%;
+    margin-bottom: 8px; /* Reduced margin */
+    height: 40px;
+}
+
+/* ****** Styles for Audio Source Selector ****** */
+.audio-source-selector {
+    width: 95%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px; /* Space below dropdown */
+    gap: 8px; /* Space between label and select */
+}
+
+.audio-source-selector label {
+    font-size: 14px;
+    color: #333;
+    white-space: nowrap;
+}
+
+.audio-source-selector select {
+    font-family: inherit; /* Use body font */
+    font-size: 14px;
+    padding: 4px 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    flex-grow: 1; /* Allow select to take available space */
+    max-width: 150px; /* Prevent it getting too wide */
+    cursor: pointer;
+}
+/* ******************************************* */
+
+
+.audio-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 8px; /* Reduced margin */
+  width: 100%;
+}
+
+.audio-controls button {
+  background-color: #a41e34;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  line-height: 1;
+}
+
+.audio-controls button:hover {
+  background-color: #d32d45;
+}
+.audio-controls button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.progress-container {
+    width: 95%;
+    margin-top: 5px;
+}
+
+#seekBar {
+    width: 100%;
+    cursor: pointer;
+    height: 8px;
+    accent-color: #a41e34;
+}
+#seekBar:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Media Queries */
+@media screen and (max-height: 450px) { /* ... */ }
+@media screen and (max-width: 768px) { /* ... */ }
