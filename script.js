@@ -142,7 +142,7 @@ function toggleNav() {
 
   // Check window width and adjust sidebar width
   const screenWidth = window.innerWidth;
-  console.log(screenWidth);
+  //console.log(screenWidth);
   const sidebarWidth = screenWidth < 320 ? screenWidth - 30 + "px" : "350px";
 
   sidebar.style.width = sidebarWidth;
