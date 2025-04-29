@@ -132,16 +132,7 @@ const nsResolver = function(prefix) {
   return ns[prefix] || null;
 };
 
-// --- DOM Element References for UI ---
-const sidebar = document.getElementById("mySidebar");
-const main = document.getElementById("main");
-const mainContent = document.getElementById("mainContent");
-const toggleButton = document.querySelector(".openbtn");
-// Widget elements are referenced in widget.js, but we need the dropdown here too
-const audioSourceDropdown_ui = document.getElementById('audioSource');
-
 // --- Core UI Functions ---
-
 function toggleNav() {
   const sidebar = document.getElementById("mySidebar");
   const toggleButton = document.querySelector(".openbtn");
@@ -151,16 +142,20 @@ function toggleNav() {
 
   // Check window width and adjust sidebar width
   const screenWidth = window.innerWidth;
+  console.log(screenWidth);
   const sidebarWidth = screenWidth < 320 ? screenWidth - 30 + "px" : "350px";
 
   sidebar.style.width = sidebarWidth;
   
-  // Apply the transform based on sidebar width
+  // Toggle sidebar
   sidebar.classList.toggle("open");
   toggleButton.classList.toggle("open");
 
   // Adjust main margin dynamically
   main.style.marginLeft = sidebar.classList.contains("open") ? sidebarWidth : "0px";
+
+  // Adjust button position dynamically
+  toggleButton.style.transform = sidebar.classList.contains("open") ? `translateX(${sidebarWidth})` : "translateX(0)";
 }
 
 
