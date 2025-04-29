@@ -623,7 +623,8 @@ function downloadAudioFile(chapterId, tts, voxType = '') {
 
 // Restores the main book list in the sidebar
 function goToIndex() {
-  if (!sidebar || !mainContent) return;
+  const sidebar = document.getElementById("mySidebar");
+  const mainContent = document.getElementById("mainContent");
 
   // Restore original sidebar content
   sidebar.innerHTML = `
