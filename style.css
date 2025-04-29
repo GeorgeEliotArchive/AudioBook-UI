@@ -282,5 +282,11 @@ p {
 }
 
 /* Media Queries */
-@media screen and (max-height: 450px) { /* ... */ }
-@media screen and (max-width: 768px) { /* ... */ }
+@media screen and (max-width: 320px) {
+  .sidebar {
+    width: calc(100vw - 30px);
+  }
+  #main.shifted {
+    margin-left: calc(100vw - 30px);
+  }
+}

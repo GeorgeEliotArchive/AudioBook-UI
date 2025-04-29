@@ -143,11 +143,26 @@ const audioSourceDropdown_ui = document.getElementById('audioSource');
 // --- Core UI Functions ---
 
 function toggleNav() {
+  const sidebar = document.getElementById("mySidebar");
+  const toggleButton = document.querySelector(".openbtn");
+  const main = document.getElementById("main");
+
   if (!sidebar || !toggleButton || !main) return;
+
+  // Check window width and adjust sidebar width
+  const screenWidth = window.innerWidth;
+  const sidebarWidth = screenWidth < 320 ? screenWidth - 30 + "px" : "350px";
+
+  sidebar.style.width = sidebarWidth;
+  
+  // Apply the transform based on sidebar width
   sidebar.classList.toggle("open");
   toggleButton.classList.toggle("open");
-  main.classList.toggle("shifted");
+
+  // Adjust main margin dynamically
+  main.style.marginLeft = sidebar.classList.contains("open") ? sidebarWidth : "0px";
 }
+
 
 function isDigit(char) {
     return /^[0-9]$/.test(char);
