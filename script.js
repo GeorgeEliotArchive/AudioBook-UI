@@ -190,72 +190,72 @@ async function loadBooks(index) {
         console.error("Error fetching XML:", error);
     }
 }
+//removed
+// function loadDownloads(mainContent, chapterId) {
+//   // Create a container for the columns
+//   let chapterContainer = document.createElement("div");
+//   chapterContainer.style.display = "flex";
+//   chapterContainer.style.justifyContent = "space-between";
+//   chapterContainer.style.marginBottom = "5px";
 
-function loadDownloads(mainContent, chapterId) {
-  // Create a container for the columns
-  let chapterContainer = document.createElement("div");
-  chapterContainer.style.display = "flex";
-  chapterContainer.style.justifyContent = "space-between";
-  chapterContainer.style.marginBottom = "5px";
+//   // Create the Librivox column
+//   let librivoxColumn = document.createElement("div");
+//   librivoxColumn.style.flex = "1";
 
-  // Create the Librivox column
-  let librivoxColumn = document.createElement("div");
-  librivoxColumn.style.flex = "1";
-
-  if (bookData[currentIndex].vox) {
-    // If `vox` is **true**, show two download buttons
-    let librivoxTitle = document.createElement("h4");
-    librivoxTitle.textContent = "Librivox";
-    librivoxTitle.style.marginBottom = "0px";
+//   if (bookData[currentIndex].vox) {
+//     // If `vox` is **true**, show two download buttons
+//     let librivoxTitle = document.createElement("h4");
+//     librivoxTitle.textContent = "Librivox";
+//     librivoxTitle.style.marginBottom = "0px";
     
-    let librivoxButtonA = document.createElement("button");
-    librivoxButtonA.textContent = "Download A";
-    librivoxButtonA.onclick = () => downloadAudioFile(chapterId, false, "A");
-    librivoxButtonA.style.marginRight = "5px";
+//     let librivoxButtonA = document.createElement("button");
+//     librivoxButtonA.textContent = "Download A";
+//     librivoxButtonA.onclick = () => downloadAudioFile(chapterId, false, "A");
+//     librivoxButtonA.style.marginRight = "5px";
 
-    let librivoxButtonB = document.createElement("button");
-    librivoxButtonB.textContent = "Download B";
-    librivoxButtonB.onclick = () => downloadAudioFile(chapterId, false, "B");
+//     let librivoxButtonB = document.createElement("button");
+//     librivoxButtonB.textContent = "Download B";
+//     librivoxButtonB.onclick = () => downloadAudioFile(chapterId, false, "B");
 
-    librivoxColumn.appendChild(librivoxTitle);
-    librivoxColumn.appendChild(librivoxButtonA);
-    librivoxColumn.appendChild(librivoxButtonB);
-  } else {
-    // If `vox` is **false**, show only one download button
-    let librivoxTitle = document.createElement("h4");
-    librivoxTitle.textContent = "Librivox";
-    librivoxTitle.style.marginBottom = "0px";
+//     librivoxColumn.appendChild(librivoxTitle);
+//     librivoxColumn.appendChild(librivoxButtonA);
+//     librivoxColumn.appendChild(librivoxButtonB);
+//   } else {
+//     // If `vox` is **false**, show only one download button
+//     let librivoxTitle = document.createElement("h4");
+//     librivoxTitle.textContent = "Librivox";
+//     librivoxTitle.style.marginBottom = "0px";
 
-    let librivoxButton = document.createElement("button");
-    librivoxButton.textContent = "Download";
-    librivoxButton.onclick = () => downloadAudioFile(chapterId);
+//     let librivoxButton = document.createElement("button");
+//     librivoxButton.textContent = "Download";
+//     librivoxButton.onclick = () => downloadAudioFile(chapterId);
 
-    librivoxColumn.appendChild(librivoxTitle);
-    librivoxColumn.appendChild(librivoxButton);
-  }
+//     librivoxColumn.appendChild(librivoxTitle);
+//     librivoxColumn.appendChild(librivoxButton);
+//   }
 
-  // Create the Text-to-Speech column
-  let ttsColumn = document.createElement("div");
-  ttsColumn.style.flex = "1";
-  let ttsTitle = document.createElement("h4");
-  ttsTitle.textContent = "Text-to-Speech";
-  ttsTitle.style.marginBottom = "0px";
-  let ttsButton = document.createElement("button");
-  ttsButton.textContent = "Download";
-  ttsButton.onclick = () => downloadAudioFile(chapterId, true);
+//   // Create the Text-to-Speech column
+//   let ttsColumn = document.createElement("div");
+//   ttsColumn.style.flex = "1";
+//   let ttsTitle = document.createElement("h4");
+//   ttsTitle.textContent = "Text-to-Speech";
+//   ttsTitle.style.marginBottom = "0px";
+//   let ttsButton = document.createElement("button");
+//   ttsButton.textContent = "Download";
+//   ttsButton.onclick = () => downloadAudioFile(chapterId, true);
 
-  ttsColumn.appendChild(ttsTitle);
-  ttsColumn.appendChild(ttsButton);
+//   ttsColumn.appendChild(ttsTitle);
+//   ttsColumn.appendChild(ttsButton);
   
-  if(bookData[currentIndex].vox === null)
-    librivoxColumn.style.display = "none";
-  // Append columns
-  chapterContainer.appendChild(librivoxColumn);
-  chapterContainer.appendChild(ttsColumn);
+//   if(bookData[currentIndex].vox === null)
+//     librivoxColumn.style.display = "none";
+//   // Append columns
+//   chapterContainer.appendChild(librivoxColumn);
+//   chapterContainer.appendChild(ttsColumn);
 
-  // Append container AFTER chapter title
-  mainContent.appendChild(chapterContainer);
-}
+//   // Append container AFTER chapter title
+//   mainContent.appendChild(chapterContainer);
+// }
 
 function parseXML(xmlString) {
     let parser = new DOMParser();
@@ -332,7 +332,7 @@ function parseXML(xmlString) {
               chapterElement.style.marginBottom = "-20px";
               chapterElement.textContent = chapterTitle;
               
-              loadDownloads(mainContent, chapterId);
+              //loadDownloads(mainContent, chapterId);
             });
         });
     } else {
@@ -407,7 +407,7 @@ function loadChapters(bookId = null) {
         chapterElement.textContent = chapterTitle;
         chapterElement.style.marginBottom = "-20px";
         mainContent.appendChild(chapterElement);
-        loadDownloads(mainContent, chapterId);
+        //loadDownloads(mainContent, chapterId);
     });
 }
 
@@ -474,7 +474,7 @@ function loadVeil(index) {
             chapterLink.textContent = formattedTitle;
             chapterLink.style.marginBottom = "-20px";
             mainContent.appendChild(chapterLink);
-            loadDownloads(mainContent, targetId);
+            //loadDownloads(mainContent, targetId);
 		}
 
         } catch (e) {
