@@ -125,30 +125,10 @@ p {
   line-height: 1.6;
 }
 
-/* --- Audio Widget Styling --- */
-.audio-widget {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 320px;
-  min-width: 280px;
-  max-width: 600px;
-  height: auto;
-  min-height: 150px; /* Increased slightly for dropdown */
-  max-height: 450px;
-  background-color: #f8f8f8;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.25);
-  z-index: 1000;
-  display: block;
-  font-family: "Crimson Text", sans-serif;
-  resize: both;
-  overflow: auto;
-}
+
 
 .audio-widget-header {
-  padding: 6px 12px;
+ 
   cursor: move;
   background-color: #a41e34;
   color: white;
@@ -204,18 +184,9 @@ p {
 #audioPlayer {
     width: 100%;
     margin-bottom: 8px; /* Reduced margin */
-    height: 40px;
+    height: 40px; 
 }
 
-/* ****** Styles for Audio Source Selector ****** */
-/* .audio-source-selector {
-    width: 95%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 10px; /* Space below dropdown */
-    gap: 8px; /* Space between label and select */
-}
 
 .audio-source-selector label {
     font-size: 14px;
@@ -279,6 +250,126 @@ p {
 #seekBar:disabled {
     cursor: not-allowed;
     opacity: 0.6;
+}
+/* Base widget: floating panel (normal mode, compact) */
+#audioWidget {
+  position: fixed;   /* or absolute */
+  bottom: 20px;
+  right: 20px;
+
+
+  top: 20px;
+  right: 20px;
+  width: 300px;
+
+  min-width: 240px;
+  max-width: 320px;
+ 
+  height: 160px;
+
+  min-height: 90px;      
+  max-height: 400px;    
+
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.25);
+  z-index: 1000;
+  display: block;
+  font-family: "Crimson Text", sans-serif;
+  resize: both;
+  overflow: auto;
+ 
+
+}
+
+/* -------- MINI MODE -------- */
+#audioWidget.mini-mode {
+  width: 56px;
+  height: 56px;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  max-height: none;
+
+  border-radius: 50%;
+  padding: 0;
+  background-color: #a41e34;          /* crimson bubble */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  overflow: visible;                  
+  resize: none;                       
+}
+
+/* Hide everything we don't want in mini mode */
+#audioWidget.mini-mode .audio-widget-header,
+#audioWidget.mini-mode #miniToggleBtn,
+#audioWidget.mini-mode #rewindBtn,
+#audioWidget.mini-mode #fastForwardBtn,
+#audioWidget.mini-mode .progress-container,
+#audioWidget.mini-mode audio {
+  display: none !important;
+}
+
+/* Use the content area as the circle interior */
+.audio-widget-content {
+  position: relative;   /* so restore button can be positioned inside */
+}
+
+/* In mini mode, center the play/pause button */
+#audioWidget.mini-mode .audio-widget-content {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Big central play/pause icon, white on crimson */
+#audioWidget.mini-mode #playPauseBtn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 26px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Default: hide restore button in normal mode */
+#restoreBtn {
+  display: none;
+}
+
+/* Mini mode: tiny restore button in bottom-right of the circle */
+#audioWidget.mini-mode #restoreBtn {
+  display: flex;
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+
+  font-size: 14px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  background:#a41e34;
+  color: white;
+  padding: 0;
 }
 
 /* Media Queries */

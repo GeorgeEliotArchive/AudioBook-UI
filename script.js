@@ -491,11 +491,7 @@ function loadAudioForChapter(chapter, setup = false) {
         console.error("Widget DOM elements not found. Cannot load audio.");
         return;
     }
-     // Ensure widget functions are available (defined in widget.js)
-    if (typeof closeAudioWidget !== 'function' || typeof updatePlayPauseButton !== 'function') {
-        console.error("Widget functions not loaded correctly.");
-        return;
-    }
+
 
     let audioFilename = bookData[currentIndex].code + '_CHAPTER';
     if(chapter < 10)
@@ -581,16 +577,6 @@ function goToIndex() {
   selectionType = 0;
   currentAudioSource = localStorage.getItem('ge_audio_source');
 
-  // Reset main content
-  // mainContent.innerHTML = `
-  //     <h2>Welcome to the George Eliot Archive</h2>
-  //     <h3>Select a work from the index menu (➔) to begin reading.</h3>`;
-
-  // Hide the audio widget
-  if (typeof closeAudioWidget === 'function') {
-      closeAudioWidget();
-  }
-
   // Reset main content margin if sidebar was closed
   if (main && !sidebar.classList.contains('open')) {
       main.classList.remove('shifted');
@@ -600,12 +586,7 @@ function goToIndex() {
 // --- Initial Setup ---
 // Set the dropdown to the stored/default value when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    // const audioSourceDropdown = document.getElementById('audioSource');
-    // if (audioSourceDropdown) {
-    //     audioSourceDropdown.value = currentAudioSource;
-    // } else {
-    //     console.warn("Audio source dropdown not found on DOMContentLoaded.");
-    // }
+    
 });
 
 
