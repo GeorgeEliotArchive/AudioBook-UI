@@ -208,7 +208,7 @@ p {
 }
 
 /* ****** Styles for Audio Source Selector ****** */
-.audio-source-selector {
+/* .audio-source-selector {
     width: 95%;
     display: flex;
     justify-content: center;
@@ -232,7 +232,7 @@ p {
     flex-grow: 1; /* Allow select to take available space */
     max-width: 150px; /* Prevent it getting too wide */
     cursor: pointer;
-}
+} */
 /* ******************************************* */
 
 

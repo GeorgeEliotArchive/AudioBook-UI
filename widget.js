@@ -8,7 +8,7 @@ const fastForwardBtn = document.getElementById('fastForwardBtn');
 const audioBookTitleEl = document.getElementById('audioBookTitle');
 const audioChapterTitleEl = document.getElementById('audioChapterTitle');
 const seekBar = document.getElementById('seekBar');
-const audioSourceDropdown = document.getElementById('audioSource'); // Added reference
+//const audioSourceDropdown = document.getElementById('audioSource'); // Added reference
 
 // --- Widget State Variables ---
 let isDragging = false;
@@ -127,4 +127,4 @@ function onDragMouseUp() {
 
 // --- Resize Functionality --- (Native CSS used)
 
-console.log("Audio Widget JS loaded.");
+// console.log("Audio Widget JS loaded.");
