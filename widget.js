@@ -94,8 +94,36 @@ if (audioWidgetHeader && audioWidget) {
       window.addEventListener('mouseup', onDragMouseUp);
     });
 }
-function onDragMouseMove(e) { /* ... unchanged ... */ }
-function onDragMouseUp() { /* ... unchanged ... */ }
+function onDragMouseMove(e) {
+  if (!isDragging || !audioWidget) return;
+
+  e.preventDefault();
+
+  // New position of the widget
+  const x = e.clientX - offsetX;
+  const y = e.clientY - offsetY;
+
+  // Apply position
+  audioWidget.style.left = `${x}px`;
+  audioWidget.style.top = `${y}px`;
+}
+
+function onDragMouseUp() {
+  if (!isDragging) return;
+  isDragging = false;
+
+  // Reset cursors
+  if (audioWidget) {
+    audioWidget.style.cursor = '';
+  }
+  if (audioWidgetHeader) {
+    audioWidgetHeader.style.cursor = 'grab';
+  }
+
+  // Remove window listeners
+  window.removeEventListener('mousemove', onDragMouseMove);
+  window.removeEventListener('mouseup', onDragMouseUp);
+}
 
 // --- Resize Functionality --- (Native CSS used)
 
