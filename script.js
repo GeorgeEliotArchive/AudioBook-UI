@@ -260,7 +260,7 @@ function parseXML(xmlString) {
     xmlDoc = parser.parseFromString(xmlString, "text/xml");
 
     const sidebar = document.getElementById("mySidebar");
-    sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb"><span onclick="goToIndex()">Index</span> > <span onclick="loadBooks(${currentIndex})">${bookData[currentIndex].name}</span></div>`;
+    sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb"><span onclick="goToIndex()">Select Text</span> > <span onclick="loadBooks(${currentIndex})">${bookData[currentIndex].name}</span></div>`;
     let books = xmlDoc.querySelectorAll('div[type="toc"] > list > ref');
     let bookList = xmlDoc.querySelectorAll(`div[type="toc"] > list > list`);
     selectionType = 0;
@@ -330,7 +330,7 @@ function parseXML(xmlString) {
 
 function loadChapters(bookId = null) {
     const sidebar = document.getElementById("mySidebar");
-    sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb"><span onclick="goToIndex()">Index</span> > <span onclick="loadBooks(${currentIndex})">${bookData[currentIndex].name}</span></div>`;
+    sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb"><span onclick="goToIndex()">Select Select Text</span> > <span onclick="loadBooks(${currentIndex})">${bookData[currentIndex].name}</span></div>`;
     const crumb = document.getElementById("breadcrumb");
     
     const mainContent = document.getElementById("mainContent");
@@ -439,7 +439,7 @@ function loadVeil(index) {
 
           // Clear current sidebar content and update with chapters
           const sidebar = document.getElementById("mySidebar");
-          sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb"><span onclick="goToIndex()">Index</span> > <span onclick="loadBooks(${currentIndex})">${bookData[currentIndex].name}</span></div>`;
+          sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb"><span onclick="goToIndex()">Select Text</span> > <span onclick="loadBooks(${currentIndex})">${bookData[currentIndex].name}</span></div>`;
           
           const mainContent = document.getElementById("mainContent");
           mainContent.innerHTML = `<h2>${bookData[currentIndex].name} Audio Files</h2>`;
@@ -629,7 +629,7 @@ function goToIndex() {
   // Restore original sidebar content
   sidebar.innerHTML = `
   <div class="breadcrumb" id="breadcrumb">
-    <span onclick="goToIndex()">Index</span>
+    <span onclick="goToIndex()">Select Text</span>
   </div>
   <a href="#" onclick="loadBooks(2)">The Sad Fortunes of the Reverend Amos Barton</a>
   <a href="#" onclick="loadBooks(1)">Mr. Gilfil's Love Story</a>
