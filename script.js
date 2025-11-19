@@ -150,6 +150,7 @@ function toggleNav() {
   // Toggle sidebar
   sidebar.classList.toggle("open");
   toggleButton.classList.toggle("open");
+  main.classList.toggle("shifted");
 
   // Adjust main margin dynamically
   main.style.marginLeft = sidebar.classList.contains("open") ? sidebarWidth : "0px";
@@ -176,6 +177,7 @@ async function loadBooks(index) {
     }
     currentIndex = index;
     let fetchUrl = BASE_TEXT_URL + bookData[index].xml;
+    
     try {
         let response = await fetch(fetchUrl);
         if (!response.ok) {
@@ -260,7 +262,18 @@ function parseXML(xmlString) {
     xmlDoc = parser.parseFromString(xmlString, "text/xml");
 
     const sidebar = document.getElementById("mySidebar");
-    sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb"><span onclick="goToIndex()">Select Text</span> > <span onclick="loadBooks(${currentIndex})">${bookData[currentIndex].name}</span></div>`;
+    if (!sidebar) {
+      console.error('Sidebar element #mySidebar not found in DOM');
+      return; // Avoid the null.innerHTML crash
+    }
+    sidebar.innerHTML = `
+        <div class="breadcrumb" id="breadcrumb">
+            <span onclick="goToIndex()">Select Text</span>
+            &gt; <span onclick="loadBooks(${currentIndex})">
+                ${bookData[currentIndex].name}
+            </span>
+        </div>
+    `;
     let books = xmlDoc.querySelectorAll('div[type="toc"] > list > ref');
     let bookList = xmlDoc.querySelectorAll(`div[type="toc"] > list > list`);
     selectionType = 0;
@@ -330,7 +343,7 @@ function parseXML(xmlString) {
 
 function loadChapters(bookId = null) {
     const sidebar = document.getElementById("mySidebar");
-    sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb"><span onclick="goToIndex()">Select Select Text</span> > <span onclick="loadBooks(${currentIndex})">${bookData[currentIndex].name}</span></div>`;
+    sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb"><span onclick="goToIndex()">Select Text</span> > <span onclick="loadBooks(${currentIndex})">${bookData[currentIndex].name}</span></div>`;
     const crumb = document.getElementById("breadcrumb");
     
     const mainContent = document.getElementById("mainContent");
@@ -655,9 +668,9 @@ function goToIndex() {
   currentAudioSource = localStorage.getItem('ge_audio_source') || 'librivox';
 
   // Reset main content
-  mainContent.innerHTML = `
-      <h2>Welcome to the George Eliot Archive</h2>
-      <h3>Select a work from the index menu (➔) to begin reading.</h3>`;
+  // mainContent.innerHTML = `
+  //     <h2>Welcome to the George Eliot Archive</h2>
+  //     <h3>Select a work from the index menu (➔) to begin reading.</h3>`;
 
   // Hide the audio widget
   if (typeof closeAudioWidget === 'function') {
@@ -680,5 +693,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn("Audio source dropdown not found on DOMContentLoaded.");
     }
 });
+
 
 //console.log("George Eliot Archive UI Initialized. Preferred source:", currentAudioSource);
