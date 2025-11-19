@@ -341,99 +341,300 @@ function parseXML(xmlString) {
     }
 }
 
+// function loadChapters(bookId = null) {
+//     const sidebar = document.getElementById("mySidebar");
+//     sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb"><span onclick="goToIndex()">Select Text</span> > <span onclick="loadBooks(${currentIndex})">${bookData[currentIndex].name}</span></div>`;
+//     const crumb = document.getElementById("breadcrumb");
+    
+//     const mainContent = document.getElementById("mainContent");
+  
+//     //console.log("Book ID:", bookId);
+//     //console.log("XML Document:", xmlDoc);
+
+//     let chapters;
+
+//     if (bookId) {
+//         mainContent.innerHTML = `<h1>${bookData[currentIndex].name} ${bookId} Audio Files</h1>`;
+//         crumb.innerHTML += ` > <span onclick="loadChapters('${bookId}')"> ${bookId}</span>`;
+//         sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb">${crumb.innerHTML}</div>`;
+//         // Locate the book referencelet
+//         let bookList = null;
+//         switch(selectionType) {
+//             case 0:
+//               bookList = xmlDoc.querySelectorAll(`div[type="toc"] > list > list`);
+//               break;
+//             case 1:
+//               bookList = xmlDoc.querySelectorAll(`div[type="toc"] > list > item > list`);
+//               break;
+//         }
+//         if (!bookList) {
+//             console.error(`Book reference not found for ID: ${bookId}`);
+//             return;
+//         }
+//         else {
+//           // Find its parent item that contains the associated list
+//           if(isDigit(bookId[bookId.length-1]))
+//             chapters = bookList[extractNumber(bookId) - 1].querySelectorAll('ref'); // Get all chapters inside the list
+//           else
+//             chapters = bookList[bookList.length-1].querySelectorAll('ref');
+//         }
+//     } else {
+//         sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb">${crumb.innerHTML}</div>`;
+//         // No book selected, load standalone chapters
+//         chapters = xmlDoc.querySelectorAll('div[type="toc"] > list > item > ref');
+//         mainContent.innerHTML = `<h2>${bookData[currentIndex].name} Audio Files</h2>`;
+//     }
+
+//     //console.log("Found chapters:", chapters);
+    
+//     // chapters.forEach(chapter => {
+//     //     let chapterTitle;
+//     //     let chapterId = chapter.getAttribute("target").replace("#", "");
+//     //     try {
+//     //       chapterTitle = xmlDoc.evaluate(`//*[@xml:id="${chapterId}"]`, xmlDoc, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.querySelector("head").textContent;
+//     //     }
+//     //     catch(e) {
+//     //       chapterTitle = chapter.textContent;
+//     //     }
+//     //     let chapterElement = document.createElement("a");
+//     //     chapterElement.href = "#";
+//     //     chapterElement.textContent = chapterTitle;
+//     //     chapterElement.onclick = function () {
+//     //         loadChapterText(chapterId, this);
+//     //     };
+//     //     sidebar.appendChild(chapterElement);
+//     //     chapterElement = document.createElement("h3");
+//     //     chapterElement.textContent = chapterTitle;
+//     //     chapterElement.style.marginBottom = "-20px";
+//     //     mainContent.appendChild(chapterElement);
+//     //     //loadDownloads(mainContent, chapterId);
+//     // });
+//     let firstChapterId = null;
+//     let firstChapterTitle = null;
+
+//     chapters.forEach((chapter, idx) => {
+//         let chapterTitle;
+//         let chapterId = chapter.getAttribute("target").replace("#", "");
+//         try {
+//             chapterTitle = xmlDoc
+//                 .evaluate(`//*[@xml:id="${chapterId}"]`, xmlDoc, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
+//                 .singleNodeValue
+//                 .querySelector("head").textContent;
+//         } catch (e) {
+//             chapterTitle = chapter.textContent;
+//         }
+
+//         let chapterElement = document.createElement("a");
+//         chapterElement.href = "#";
+//         chapterElement.textContent = chapterTitle;
+//         chapterElement.onclick = function (e) {
+//             e.preventDefault();
+//             loadChapterText(chapterId, this, chapterTitle);
+//         };
+//         sidebar.appendChild(chapterElement);
+
+//         const chapterHeading = document.createElement("h3");
+//         chapterHeading.textContent = chapterTitle;
+//         chapterHeading.style.marginBottom = "-20px";
+//         mainContent.appendChild(chapterHeading);
+
+//         // Remember the first chapter in this list
+//         if (idx === 0) {
+//             firstChapterId = chapterId;
+//             firstChapterTitle = chapterTitle;
+//         }
+//     });
+
+
+//     if (firstChapterId) {
+//         loadChapterText(firstChapterId, null, firstChapterTitle);
+//     }
+
+// }
+
+// function loadChapterText(chapterId, element) {
+//     if(extractNumber(chapterId) != currentChapterNo) {
+//       //console.log(element.innerHTML);
+//       currentChapter = element.innerHTML;
+//       currentChapterNo = extractNumber(chapterId);
+      
+//       loadAudioForChapter(currentChapterNo, true);
+
+//       // Find the element with the given xml:id
+//       let chapter = xmlDoc.evaluate(`//*[@xml:id="${chapterId}"]`, xmlDoc, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+      
+//       let content = document.getElementById("mainContent");
+
+//       if (chapter) {
+//         content.innerHTML = `<h2>${chapter.querySelector("head").textContent}</h2>`;
+
+//         chapter.querySelectorAll("p").forEach(p => {
+//             let formattedText = p.innerHTML.replace(/_/g, ""); // Remove all underscores
+//             content.innerHTML += `<p>${formattedText}</p>`;
+//         });
+//       }
+//     }
+// }
 function loadChapters(bookId = null) {
     const sidebar = document.getElementById("mySidebar");
-    sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb"><span onclick="goToIndex()">Select Text</span> > <span onclick="loadBooks(${currentIndex})">${bookData[currentIndex].name}</span></div>`;
+    sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb"><span onclick="goToIndex()">Select Text</span> &gt; <span onclick="loadBooks(${currentIndex})">${bookData[currentIndex].name}</span></div>`;
     const crumb = document.getElementById("breadcrumb");
-    
+
     const mainContent = document.getElementById("mainContent");
-  
-    //console.log("Book ID:", bookId);
-    //console.log("XML Document:", xmlDoc);
 
     let chapters;
 
     if (bookId) {
-        mainContent.innerHTML = `<h1>${bookData[currentIndex].name} ${bookId} Audio Files</h1>`;
-        crumb.innerHTML += ` > <span onclick="loadChapters('${bookId}')"> ${bookId}</span>`;
+        // Nested structure: Title -> Book I / Book II -> Chapters
+        mainContent.innerHTML = `<h1>${bookData[currentIndex].name} ${bookId}</h1>`;
+        crumb.innerHTML += ` &gt; <span onclick="loadChapters('${bookId}')">${bookId}</span>`;
         sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb">${crumb.innerHTML}</div>`;
-        // Locate the book referencelet
+
+        // Pick the correct list of chapters for this bookId
         let bookList = null;
-        switch(selectionType) {
+        switch (selectionType) {
             case 0:
-              bookList = xmlDoc.querySelectorAll(`div[type="toc"] > list > list`);
-              break;
+                bookList = xmlDoc.querySelectorAll(`div[type="toc"] > list > list`);
+                break;
             case 1:
-              bookList = xmlDoc.querySelectorAll(`div[type="toc"] > list > item > list`);
-              break;
+                bookList = xmlDoc.querySelectorAll(`div[type="toc"] > list > item > list`);
+                break;
         }
-        if (!bookList) {
-            console.error(`Book reference not found for ID: ${bookId}`);
-            return;
-        }
-        else {
-          // Find its parent item that contains the associated list
-          if(isDigit(bookId[bookId.length-1]))
-            chapters = bookList[extractNumber(bookId) - 1].querySelectorAll('ref'); // Get all chapters inside the list
-          else
-            chapters = bookList[bookList.length-1].querySelectorAll('ref');
+
+        if (bookList && bookList.length > 0) {
+            // Use the numeric part of bookId (e.g., "Book 1" -> index 0) if available
+            let idx = extractNumber(bookId) - 1;
+            if (isNaN(idx) || idx < 0 || idx >= bookList.length) {
+                idx = 0; // fallback to first book list
+            }
+            chapters = bookList[idx].querySelectorAll("ref");
+        } else {
+            chapters = [];
         }
     } else {
+        // Flat structure: Title -> Chapters
+        crumb.innerHTML += ` &gt; <span onclick="loadChapters()">Chapters</span>`;
         sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb">${crumb.innerHTML}</div>`;
-        // No book selected, load standalone chapters
-        chapters = xmlDoc.querySelectorAll('div[type="toc"] > list > item > ref');
-        mainContent.innerHTML = `<h2>${bookData[currentIndex].name} Audio Files</h2>`;
+        mainContent.innerHTML = `<h2>${bookData[currentIndex].name}</h2>`;
+
+        // You already set selectionType in parseXML; reuse it here
+        switch (selectionType) {
+            case 0:
+                chapters = xmlDoc.querySelectorAll('div[type="toc"] > list > ref');
+                break;
+            case 1:
+                chapters = xmlDoc.querySelectorAll('div[type="toc"] > list > item > ref');
+                break;
+            default:
+                chapters = [];
+        }
     }
 
-    //console.log("Found chapters:", chapters);
-    
-    chapters.forEach(chapter => {
+    if (!chapters || chapters.length === 0) {
+        mainContent.innerHTML += `<p>No chapters found.</p>`;
+        return;
+    }
+
+    // 👉 Remember first chapter so we can auto-load it
+    let firstChapterId = null;
+    let firstChapterTitle = null;
+
+    chapters.forEach((chapter, index) => {
         let chapterTitle;
         let chapterId = chapter.getAttribute("target").replace("#", "");
+
         try {
-          chapterTitle = xmlDoc.evaluate(`//*[@xml:id="${chapterId}"]`, xmlDoc, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.querySelector("head").textContent;
+            const node = xmlDoc.evaluate(
+                `//*[@xml:id="${chapterId}"]`,
+                xmlDoc,
+                nsResolver,
+                XPathResult.FIRST_ORDERED_NODE_TYPE,
+                null
+            ).singleNodeValue;
+            chapterTitle = node
+                ? node.querySelector("head").textContent
+                : chapter.textContent;
+        } catch (e) {
+            chapterTitle = chapter.textContent;
         }
-        catch(e) {
-          chapterTitle = chapter.textContent;
-        }
-        let chapterElement = document.createElement("a");
-        chapterElement.href = "#";
-        chapterElement.textContent = chapterTitle;
-        chapterElement.onclick = function () {
-            loadChapterText(chapterId, this);
+
+        // Sidebar link
+        const chapterLink = document.createElement("a");
+        chapterLink.href = "#";
+        chapterLink.textContent = chapterTitle;
+        chapterLink.onclick = function (e) {
+            e.preventDefault();
+            loadChapterText(chapterId, this, chapterTitle);
         };
-        sidebar.appendChild(chapterElement);
-        chapterElement = document.createElement("h3");
-        chapterElement.textContent = chapterTitle;
-        chapterElement.style.marginBottom = "-20px";
-        mainContent.appendChild(chapterElement);
-        //loadDownloads(mainContent, chapterId);
+        sidebar.appendChild(chapterLink);
+
+        // Optional heading in main content (you can keep or remove)
+        const chapterHeading = document.createElement("h3");
+        chapterHeading.textContent = chapterTitle;
+        chapterHeading.style.marginBottom = "-20px";
+        // If you don’t want these headings, comment out next line:
+        // mainContent.appendChild(chapterHeading);
+
+        // Save first chapter for default display
+        if (index === 0) {
+            firstChapterId = chapterId;
+            firstChapterTitle = chapterTitle;
+        }
+    });
+
+    if (firstChapterId) {
+        loadChapterText(firstChapterId, null, firstChapterTitle);
+    }
+}
+
+function loadChapterText(chapterId, element = null, titleOverride = null) {
+    const chapterNo = extractNumber(chapterId);
+    if (chapterNo === currentChapterNo) {
+        return; // already showing this chapter
+    }
+
+    // Update "current chapter" label for audio widget
+    if (element) {
+        currentChapter = element.innerHTML;
+    } else if (titleOverride) {
+        currentChapter = titleOverride;
+    } else {
+        currentChapter = "";
+    }
+    currentChapterNo = chapterNo;
+
+    // If you still use this for the audio widget:
+    if (typeof loadAudioForChapter === "function") {
+        loadAudioForChapter(currentChapterNo, true);
+    }
+
+    // Find the element with the given xml:id
+    const chapterNode = xmlDoc.evaluate(
+        `//*[@xml:id="${chapterId}"]`,
+        xmlDoc,
+        nsResolver,
+        XPathResult.FIRST_ORDERED_NODE_TYPE,
+        null
+    ).singleNodeValue;
+
+    const content = document.getElementById("mainContent");
+    if (!content || !chapterNode) return;
+
+    const headNode = chapterNode.querySelector("head");
+    const headingText =
+        (headNode && headNode.textContent) ||
+        titleOverride ||
+        currentChapter ||
+        "";
+
+    content.innerHTML = `<h2>${headingText}</h2>`;
+
+    chapterNode.querySelectorAll("p").forEach(p => {
+        const formattedText = p.innerHTML.replace(/_/g, ""); // Remove underscores
+        content.innerHTML += `<p>${formattedText}</p>`;
     });
 }
 
-function loadChapterText(chapterId, element) {
-    if(extractNumber(chapterId) != currentChapterNo) {
-      //console.log(element.innerHTML);
-      currentChapter = element.innerHTML;
-      currentChapterNo = extractNumber(chapterId);
-      
-      loadAudioForChapter(currentChapterNo, true);
-
-      // Find the element with the given xml:id
-      let chapter = xmlDoc.evaluate(`//*[@xml:id="${chapterId}"]`, xmlDoc, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-      
-      let content = document.getElementById("mainContent");
-
-      if (chapter) {
-        content.innerHTML = `<h2>${chapter.querySelector("head").textContent}</h2>`;
-
-        chapter.querySelectorAll("p").forEach(p => {
-            let formattedText = p.innerHTML.replace(/_/g, ""); // Remove all underscores
-            content.innerHTML += `<p>${formattedText}</p>`;
-        });
-      }
-    }
-}
 
 function loadVeil(index) {
   currentIndex = index;
