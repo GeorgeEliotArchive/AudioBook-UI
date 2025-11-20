@@ -154,3 +154,12 @@ function onDragMouseUp() {
   window.removeEventListener('mousemove', onDragMouseMove);
   window.removeEventListener('mouseup', onDragMouseUp);
 }
+document.addEventListener("DOMContentLoaded", () => {
+    const isMobileUA = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
+    const isMobileScreen = window.matchMedia("(max-width: 768px)").matches;
+
+    if (isMobileUA || isMobileScreen) {
+        // Auto-switch to mini mode when mobile device detected
+        enterMiniMode();
+    }
+});
