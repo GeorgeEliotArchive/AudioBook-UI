@@ -152,7 +152,13 @@ function extractNumber(id) {
     let match = id.match(/\d+/);
     return match ? parseInt(match[0], 10) : null;
 }
+let audioIndex = {};
 
+async function loadAudioIndex() {
+  const res = await fetch('./audioIndex.json');
+  audioIndex = await res.json();
+  
+}
 async function loadBooks(index) {
     currentChapter = '';
     if (index < 0 || index >= bookData.length) {
@@ -207,6 +213,7 @@ function parseXML(xmlString) {
         
     if (books[0].innerHTML.includes("ook") || books[0].innerHTML.includes("art")) {
         // Books exist: Load Books first
+        
         books.forEach(book => {
             let bookTitle = book.textContent;
             let bookId = book.getAttribute("target");
@@ -220,11 +227,12 @@ function parseXML(xmlString) {
               bookId = bookId.charAt(1).toUpperCase() + bookId.substring(2,bookId.length);
               chapters = bookList[bookList.length-1].querySelectorAll('ref');
             }
-
+            
             let bookElement = document.createElement("a");
             bookElement.href = "#";
             bookElement.textContent = bookTitle;
             bookElement.onclick = function () {
+               
                 loadChapters(bookId);
             };
             sidebar.appendChild(bookElement);
@@ -473,77 +481,93 @@ function loadVeil(index) {
   xhr.send();
 }
 
-// Helper function to load audio based on current source selection
 function loadAudioForChapter(chapter, setup = false) {
-    // Ensure widget elements are available (defined in widget.js or globally)
     const audioPlayer = document.getElementById('audioPlayer');
     const audioWidget = document.getElementById('audioWidget');
     const audioBookTitleEl = document.getElementById('audioBookTitle');
     const audioChapterTitleEl = document.getElementById('audioChapterTitle');
     const seekBar = document.getElementById('seekBar');
-    //const audioSourceDropdown = document.getElementById('audioSource');
-    const playPauseBtn = document.getElementById('playPauseBtn'); // Needed for disabling
+    const playPauseBtn = document.getElementById('playPauseBtn');
     const rewindBtn = document.getElementById('rewindBtn');
     const fastForwardBtn = document.getElementById('fastForwardBtn');
 
-
-    if (!audioPlayer || !audioWidget || !audioBookTitleEl || !audioChapterTitleEl || !seekBar  || !playPauseBtn || !rewindBtn || !fastForwardBtn) {
+    if (!audioPlayer || !audioWidget || !audioBookTitleEl || !audioChapterTitleEl ||
+        !seekBar || !playPauseBtn || !rewindBtn || !fastForwardBtn) {
         console.error("Widget DOM elements not found. Cannot load audio.");
         return;
     }
 
+    const bookCode = bookData[currentIndex].code;
+    const audioFolder = bookData[currentIndex].tts;
 
-    let audioFilename = bookData[currentIndex].code + '_CHAPTER';
-    if(chapter < 10)
-      audioFilename += '0';
-    audioFilename += String(chapter);
-   
-    let selectedSource = 'tts'; 
-    audioFilename += '.mp3';
-    const audioFolder = bookData[currentIndex].tts; // Get folder for selected source
-    let baseAudioUrl =  BASE_TTS_AUDIO_URL 
+    const chapterNoStr = String(chapter).padStart(2, '0');
+    const chapterKey = `${bookCode}_CHAPTER${chapterNoStr}`;
 
-   
-    if (audioFolder && audioFilename) {
-        const audioUrl = `${baseAudioUrl}${audioFolder}/${audioFilename}`;
-        //console.log(`Setting ${selectedSource} audio source:`, audioUrl);
+    // New mapping first (nested AB/TS), then optional flat mapping, else legacy filename
+   const idx = audioIndex;
 
-        if (!audioPlayer.paused) audioPlayer.pause();
-        // Setting src to empty first can help avoid issues in some browsers when changing source
-        audioPlayer.src = "";
-        audioPlayer.src = audioUrl;
-        audioPlayer.load(); // Explicitly load
+    const mapped =
+  (idx && idx[bookCode] && idx[bookCode][chapterKey]) ||
+  (idx && idx[chapterKey]) ||
+  null;
 
+
+    const audioFilename = mapped || `${chapterKey}.mp3`;
+    console.log("File name pulled is: " + audioFilename);
+    if (!audioFolder) {
+        console.warn(`Audio folder (tts) not specified for book "${bookData[currentIndex].name}".`);
         audioBookTitleEl.textContent = bookData[currentIndex].name;
-        audioChapterTitleEl.textContent = currentChapter;
-        audioWidget.style.display = 'block';
-        updatePlayPauseButton(); // Update button state
-        seekBar.value = 0; // Reset seek bar
-        // Ensure controls are enabled
-        playPauseBtn.disabled = false;
-        rewindBtn.disabled = false;
-        fastForwardBtn.disabled = false;
-        seekBar.disabled = false;
-       
-    } else {
-        console.warn(`Audio file/folder not specified for source "${selectedSource}" for key "${chapter}" in book "${bookData[currentIndex].name}".`);
-        // Display message in widget, disable player
-        audioBookTitleEl.textContent = bookData[currentIndex].name;
-        audioChapterTitleEl.textContent = `${currentChapter} (${selectedSource} unavailable)`;
+        audioChapterTitleEl.textContent = `${currentChapter} (audio unavailable)`;
         audioPlayer.removeAttribute('src');
-        audioPlayer.load(); // Try to clear player state
+        audioPlayer.load();
         playPauseBtn.disabled = true;
         rewindBtn.disabled = true;
         fastForwardBtn.disabled = true;
         seekBar.disabled = true;
         seekBar.value = 0;
-        updatePlayPauseButton(); // Update button state
-        audioWidget.style.display = 'block'; // Keep widget visible
-        // Optionally disable the dropdown if only one source exists or none exist?
-        // audioSourceDropdown.disabled = true; // Or more complex logic
+        if (typeof updatePlayPauseButton === "function") updatePlayPauseButton();
+        audioWidget.style.display = 'block';
+        return;
     }
-}
 
+    // Use ONE base URL (pick the one you actually use elsewhere)
+    const base = (typeof BASE_TTS_AUDIO_URL !== "undefined") ? BASE_TTS_AUDIO_URL : baseAudioUrl;
+    const audioUrl = `${base}${audioFolder}/${audioFilename}`;
+
+    // Optional: install onerror handler once (avoid re-adding every call)
+    if (!audioPlayer.__hasErrorHandler) {
+        audioPlayer.__hasErrorHandler = true;
+        audioPlayer.addEventListener('error', () => {
+            console.warn("Audio failed to load:", audioPlayer.src);
+            audioBookTitleEl.textContent = bookData[currentIndex].name;
+            audioChapterTitleEl.textContent = `${currentChapter} (audio unavailable)`;
+            playPauseBtn.disabled = true;
+            rewindBtn.disabled = true;
+            fastForwardBtn.disabled = true;
+            seekBar.disabled = true;
+            seekBar.value = 0;
+            if (typeof updatePlayPauseButton === "function") updatePlayPauseButton();
+        });
+    }
+
+    // Load audio
+    if (!audioPlayer.paused) audioPlayer.pause();
+    audioPlayer.src = "";
+    audioPlayer.src = audioUrl;
+    audioPlayer.load();
+
+    // Update UI
+    audioBookTitleEl.textContent = bookData[currentIndex].name;
+    audioChapterTitleEl.textContent = currentChapter;
+    audioWidget.style.display = 'block';
+
+    seekBar.value = 0;
+    playPauseBtn.disabled = false;
+    rewindBtn.disabled = false;
+    fastForwardBtn.disabled = false;
+    seekBar.disabled = false;
+    if (typeof updatePlayPauseButton === "function") updatePlayPauseButton();
+}
 
 // Restores the main book list in the sidebar
 function goToIndex() {
@@ -585,8 +609,8 @@ function goToIndex() {
 
 // --- Initial Setup ---
 // Set the dropdown to the stored/default value when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    
+document.addEventListener('DOMContentLoaded', async() => {
+    await loadAudioIndex();
 });
 
 
