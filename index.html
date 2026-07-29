@@ -46,11 +46,13 @@
     <div id="audioWidget" class="audio-widget">
       <div class="audio-widget-header" id="audioWidgetHeader">
         <div class="audio-info">
-          <span id="audioBookTitle">Book Title</span> -
-          <span id="audioChapterTitle">Chapter</span>
+          <span class="audio-info-track">
+            <span id="audioBookTitle">Book Title</span> -
+            <span id="audioChapterTitle">Chapter</span>
+          </span>
         </div>
         <!-- Button to go INTO mini mode -->
-        <button id="miniToggleBtn" type="button" title="Mini player">○</button>
+        <button id="miniToggleBtn" type="button" title="Switch to mini player" aria-label="Switch to mini player" data-tooltip="Mini player">○</button>
       </div>
 
       <div class="audio-widget-content">
@@ -62,15 +64,15 @@
 
         <!-- Custom Controls -->
         <div class="audio-controls">
-          <button id="rewindBtn" type="button" onclick="rewindAudio(10)" title="Rewind 10s">⏮</button>
+          <button id="rewindBtn" type="button" onclick="rewindAudio(10)" title="Rewind 10 seconds" aria-label="Rewind 10 seconds" data-tooltip="Rewind 10 seconds">⏮</button>
 
           <!-- This play/pause is used in both normal and mini mode -->
-          <button id="playPauseBtn" type="button" onclick="togglePlayPause()" title="Play/Pause">▶</button>
+          <button id="playPauseBtn" type="button" onclick="togglePlayPause()" title="Play" aria-label="Play" data-tooltip="Play">▶</button>
 
-          <button id="fastForwardBtn" type="button" onclick="forwardAudio(10)" title="Forward 10s">⏭</button>
+          <button id="fastForwardBtn" type="button" onclick="forwardAudio(10)" title="Forward 10 seconds" aria-label="Forward 10 seconds" data-tooltip="Forward 10 seconds">⏭</button>
 
           <!-- Button to go BACK to normal display (only visible in mini mode) -->
-          <button id="restoreBtn" class="mini-restore-btn" type="button" title="Expand player">⤢</button>
+          <button id="restoreBtn" class="mini-restore-btn" type="button" title="Exit mini player" aria-label="Exit mini player" data-tooltip="Exit mini player">×</button>
         </div>
 
         <div class="progress-container">
@@ -89,4 +91,3 @@
 </body>
 
 </html>
-

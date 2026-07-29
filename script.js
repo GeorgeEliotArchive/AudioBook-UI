@@ -161,6 +161,9 @@ async function loadAudioIndex() {
 }
 async function loadBooks(index) {
     currentChapter = '';
+    // A chapter number can repeat across books. Reset it so chapter 1 in the
+    // newly selected title is not mistaken for the chapter already on screen.
+    currentChapterNo = -1;
     if (index < 0 || index >= bookData.length) {
         console.error("Invalid index provided.");
         return;
@@ -213,10 +216,38 @@ function parseXML(xmlString) {
         
     if (books[0].innerHTML.includes("ook") || books[0].innerHTML.includes("art")) {
         // Books exist: Load Books first
-        
+        let firstChapterId = null;
+        let firstChapterTitle = null;
+
         books.forEach(book => {
             let bookTitle = book.textContent;
             let bookId = book.getAttribute("target");
+            const standaloneId = bookId.replace("#", "");
+            const standaloneNode = xmlDoc.evaluate(
+                `//*[@xml:id="${standaloneId}"]`,
+                xmlDoc,
+                nsResolver,
+                XPathResult.FIRST_ORDERED_NODE_TYPE,
+                null
+            ).singleNodeValue;
+
+            // Some works end with a text-only top-level entry rather than
+            // another numbered book. Middlemarch's FINALE is one such entry.
+            const isStandaloneText = standaloneNode &&
+                Array.from(standaloneNode.children).some(child => child.tagName === "p");
+
+            if (isStandaloneText) {
+              const standaloneLink = document.createElement("a");
+              standaloneLink.href = "#";
+              standaloneLink.textContent = bookTitle;
+              standaloneLink.onclick = function (e) {
+                  e.preventDefault();
+                  loadChapterText(standaloneId, this, bookTitle);
+              };
+              sidebar.appendChild(standaloneLink);
+              return;
+            }
+
             if(isDigit(bookId[bookId.length-1]))
             {
               bookId = bookId.charAt(1).toUpperCase() + bookId.substring(2,bookId.length-1) + " " + bookId[bookId.length-1];
@@ -253,6 +284,15 @@ function parseXML(xmlString) {
                   chapterTitle = chapter.textContent;
               }
 
+              // Nested tables of contents used to stop at Book/Part and leave
+              // the reader blank. Remember the first actual chapter so the
+              // selected title opens immediately, while keeping Book/Part
+              // links in the sidebar for navigation.
+              if (!firstChapterId) {
+                  firstChapterId = chapterId;
+                  firstChapterTitle = chapterTitle;
+              }
+
               // Create the chapter title element
               let chapterElement = document.createElement("h3");
               chapterElement.style.marginBottom = "-20px";
@@ -261,6 +301,10 @@ function parseXML(xmlString) {
               
             });
         });
+
+        if (firstChapterId) {
+            loadChapterText(firstChapterId, null, firstChapterTitle);
+        }
     } else {
         // No Books: Load Chapters directly
         loadChapters();
@@ -381,8 +425,14 @@ function loadChapters(bookId = null) {
 
 function loadChapterText(chapterId, element = null, titleOverride = null) {
     const chapterNo = extractNumber(chapterId);
-    if (chapterNo === currentChapterNo) {
-        return; // already showing this chapter
+    const content = document.getElementById("mainContent");
+    if (
+        chapterNo === currentChapterNo &&
+        content &&
+        content.dataset.chapterId === chapterId &&
+        content.querySelector("p")
+    ) {
+        return; // This exact chapter is still rendered; preserve audio position.
     }
 
     // Update "current chapter" label for audio widget
@@ -409,7 +459,6 @@ function loadChapterText(chapterId, element = null, titleOverride = null) {
         null
     ).singleNodeValue;
 
-    const content = document.getElementById("mainContent");
     if (!content || !chapterNode) return;
 
     const headNode = chapterNode.querySelector("head");
@@ -420,6 +469,7 @@ function loadChapterText(chapterId, element = null, titleOverride = null) {
         "";
 
     content.innerHTML = `<h2>${headingText}</h2>`;
+    content.dataset.chapterId = chapterId;
 
     chapterNode.querySelectorAll("p").forEach(p => {
         const formattedText = p.innerHTML.replace(/_/g, ""); // Remove underscores
@@ -429,6 +479,8 @@ function loadChapterText(chapterId, element = null, titleOverride = null) {
 
 
 function loadVeil(index) {
+  currentChapter = '';
+  currentChapterNo = -1;
   currentIndex = index;
   let fetchUrl = BASE_TEXT_URL + bookData[index].xml;
   var xhr = new XMLHttpRequest();
@@ -441,14 +493,17 @@ function loadVeil(index) {
           // Manually parse the response text as XML
           var parser = new DOMParser();
           xmlDoc = parser.parseFromString(responseText, "text/xml");
-          var chapters = xmlDoc.getElementsByTagName("div");
+          const chapters = xmlDoc.querySelectorAll('div[type="chapter"]');
 
           // Clear current sidebar content and update with chapters
           const sidebar = document.getElementById("mySidebar");
-          sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb"><span onclick="goToIndex()">Select Text</span> > <span onclick="loadBooks(${currentIndex})">${bookData[currentIndex].name}</span></div>`;
+          sidebar.innerHTML = `<div class="breadcrumb" id="breadcrumb"><span onclick="goToIndex()">Select Text</span> &gt; <span onclick="loadVeil(${currentIndex})">${bookData[currentIndex].name}</span></div>`;
           
           const mainContent = document.getElementById("mainContent");
-          mainContent.innerHTML = `<h2>${bookData[currentIndex].name} Audio Files</h2>`;
+          mainContent.innerHTML = `<h2>${bookData[currentIndex].name}</h2>`;
+          let firstChapterId = null;
+          let firstChapterTitle = null;
+
           for (var i = 0; i < chapters.length; i++) {
 			var rawTitle = chapters[i].getElementsByTagName("head")[0]?.textContent || "Unnamed Chapter";
 
@@ -461,14 +516,23 @@ function loadVeil(index) {
 			var chapterLink = document.createElement("a");
 			chapterLink.href = "#";
 			chapterLink.textContent = formattedTitle;
-			chapterLink.setAttribute("onclick", `loadChapterText('${targetId}', this)`);
+			chapterLink.onclick = function (chapterId, chapterTitle) {
+              return function (e) {
+                e.preventDefault();
+                loadChapterText(chapterId, this, chapterTitle);
+              };
+            }(targetId, formattedTitle);
 			sidebar.appendChild(chapterLink);
-            chapterLink = document.createElement("h3");
-            chapterLink.textContent = formattedTitle;
-            chapterLink.style.marginBottom = "-20px";
-            mainContent.appendChild(chapterLink);
-            //loadDownloads(mainContent, targetId);
+
+            if (!firstChapterId) {
+              firstChapterId = targetId;
+              firstChapterTitle = formattedTitle;
+            }
 		}
+
+          if (firstChapterId) {
+            loadChapterText(firstChapterId, null, firstChapterTitle);
+          }
 
         } catch (e) {
           console.error("Failed to parse XML:", e);
@@ -494,6 +558,23 @@ function loadAudioForChapter(chapter, setup = false) {
     if (!audioPlayer || !audioWidget || !audioBookTitleEl || !audioChapterTitleEl ||
         !seekBar || !playPauseBtn || !rewindBtn || !fastForwardBtn) {
         console.error("Widget DOM elements not found. Cannot load audio.");
+        return;
+    }
+
+    // Text-only sections such as Middlemarch's FINALE have no numeric chapter
+    // and deliberately have no corresponding audio file.
+    if (chapter === null || Number.isNaN(chapter)) {
+        audioBookTitleEl.textContent = bookData[currentIndex].name;
+        audioChapterTitleEl.textContent = `${currentChapter} (audio unavailable)`;
+        audioPlayer.removeAttribute('src');
+        audioPlayer.load();
+        playPauseBtn.disabled = true;
+        rewindBtn.disabled = true;
+        fastForwardBtn.disabled = true;
+        seekBar.disabled = true;
+        seekBar.value = 0;
+        if (typeof updatePlayPauseButton === "function") updatePlayPauseButton();
+        audioWidget.style.display = 'block';
         return;
     }
 

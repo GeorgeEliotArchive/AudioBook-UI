@@ -128,7 +128,6 @@ p {
 
 
 .audio-widget-header {
- 
   cursor: move;
   background-color: #a41e34;
   color: white;
@@ -136,7 +135,9 @@ p {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 32px;
+  height: 38px;
+  padding: 0 8px 0 10px;
+  box-sizing: border-box;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
@@ -151,13 +152,116 @@ p {
 }
 
 .audio-widget-header .audio-info {
-  flex-grow: 1;
+  flex: 1 1 auto;
+  min-width: 0;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
   font-size: 14px;
-  padding: 0 5px;
+  padding: 0 8px;
+}
+
+.audio-info-track {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.audio-info.is-overflowing {
+  text-align: left;
+}
+
+.audio-info.is-overflowing .audio-info-track {
+  padding-left: 100%;
+  animation: scroll-audio-title 12s linear infinite;
+}
+
+.audio-info.is-overflowing:hover .audio-info-track {
+  animation-play-state: paused;
+}
+
+@keyframes scroll-audio-title {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .audio-info.is-overflowing .audio-info-track {
+    animation: none;
+    padding-left: 0;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    overflow: hidden;
+  }
+}
+
+#miniToggleBtn {
+  position: relative;
+  z-index: 3;
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+  line-height: 1;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+#miniToggleBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+/* Visible hover labels supplement the native title and accessible name. */
+#audioWidget button[data-tooltip] {
+  position: relative;
+}
+
+#audioWidget button[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 7px);
+  transform: translateX(-50%) translateY(3px);
+  width: max-content;
+  max-width: 180px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  background: rgba(35, 26, 28, 0.94);
+  color: #fff;
+  font-family: "Crimson Text", sans-serif;
+  font-size: 13px;
+  font-weight: normal;
+  line-height: 1.15;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+}
+
+#audioWidget button[data-tooltip]:hover::after,
+#audioWidget button[data-tooltip]:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+#miniToggleBtn[data-tooltip]::after {
+  top: 50%;
+  right: calc(100% + 8px);
+  bottom: auto;
+  left: auto;
+  transform: translateY(-50%) translateX(3px);
+}
+
+#miniToggleBtn[data-tooltip]:hover::after,
+#miniToggleBtn[data-tooltip]:focus-visible::after {
+  transform: translateY(-50%) translateX(0);
 }
 
 .audio-widget-header .close-widget-btn {
@@ -175,16 +279,14 @@ p {
 }
 
 .audio-widget-content {
-  padding: 10px 12px; /* Adjusted padding */
+  padding: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 #audioPlayer {
-    width: 100%;
-    margin-bottom: 8px; /* Reduced margin */
-    height: 40px; 
+    display: none;
 }
 
 
@@ -203,7 +305,7 @@ p {
     flex-grow: 1; /* Allow select to take available space */
     max-width: 150px; /* Prevent it getting too wide */
     cursor: pointer;
-} */
+}
 /* ******************************************* */
 
 
@@ -253,22 +355,19 @@ p {
 }
 /* Base widget: floating panel (normal mode, compact) */
 #audioWidget {
-  position: fixed;   /* or absolute */
-  bottom: 20px;
-  right: 20px;
-
-
+  position: fixed;
+  box-sizing: border-box;
   top: 20px;
   right: 20px;
-  width: 300px;
+  width: 320px;
 
-  min-width: 240px;
-  max-width: 320px;
+  min-width: 260px;
+  max-width: 520px;
  
-  height: 160px;
+  height: 126px;
 
-  min-height: 90px;      
-  max-height: 400px;    
+  min-height: 118px;
+  max-height: 260px;
 
   background-color: #f8f8f8;
   border: 1px solid #ccc;
@@ -278,15 +377,15 @@ p {
   display: block;
   font-family: "Crimson Text", sans-serif;
   resize: both;
-  overflow: auto;
+  overflow: hidden;
  
 
 }
 
 /* -------- MINI MODE -------- */
 #audioWidget.mini-mode {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   min-width: 0;
   min-height: 0;
   max-width: none;
@@ -295,7 +394,8 @@ p {
   border-radius: 50%;
   padding: 0;
   background-color: #a41e34;          /* crimson bubble */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  border: 2px solid rgba(255,255,255,0.82);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.28);
 
   display: flex;
   justify-content: center;
@@ -343,6 +443,13 @@ p {
   justify-content: center;
   border-radius: 50%;
   cursor: pointer;
+  position: relative;
+  z-index: 1;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+#audioWidget.mini-mode #playPauseBtn:hover {
+  background: rgba(255,255,255,0.12);
 }
 
 /* Default: hide restore button in normal mode */
@@ -350,7 +457,7 @@ p {
   display: none;
 }
 
-/* Mini mode: tiny restore button in bottom-right of the circle */
+/* Mini mode: clear exit control, distinct from a browser resize handle. */
 #audioWidget.mini-mode #restoreBtn {
   display: flex;
   position: absolute;
@@ -362,7 +469,8 @@ p {
   border-radius: 50%;
   border: none;
 
-  font-size: 14px;
+  font-size: 17px;
+  line-height: 1;
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -370,6 +478,8 @@ p {
   background:#a41e34;
   color: white;
   padding: 0;
+  z-index: 4;
+  pointer-events: auto;
 }
 
 /* Media Queries */

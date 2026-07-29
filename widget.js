@@ -13,16 +13,57 @@ const restoreBtn = document.getElementById('restoreBtn');
 let isDragging = false;
 let offsetX = 0;
 let offsetY = 0;
+let normalWidgetSize = null;
 
 // --- Mini-mode helpers ---
 function enterMiniMode() {
-  if (!audioWidget) return;
+  if (!audioWidget || audioWidget.classList.contains('mini-mode')) return;
+
+  const bounds = audioWidget.getBoundingClientRect();
+  normalWidgetSize = {
+    width: `${bounds.width}px`,
+    height: `${bounds.height}px`
+  };
+
   audioWidget.classList.add('mini-mode');
+  // Browser resize handles leave a used width/height that can win over the
+  // class rules. Inline mini dimensions make the bubble deterministic.
+  audioWidget.style.width = '60px';
+  audioWidget.style.height = '60px';
 }
 
 function exitMiniMode() {
   if (!audioWidget) return;
   audioWidget.classList.remove('mini-mode');
+
+  if (normalWidgetSize) {
+    audioWidget.style.width = normalWidgetSize.width;
+    audioWidget.style.height = normalWidgetSize.height;
+  } else {
+    audioWidget.style.removeProperty('width');
+    audioWidget.style.removeProperty('height');
+  }
+  window.requestAnimationFrame(updateTitleOverflow);
+}
+
+// Scroll long book/chapter labels, but leave short labels centered and still.
+const audioInfo = document.querySelector('.audio-info');
+const audioInfoTrack = document.querySelector('.audio-info-track');
+
+function updateTitleOverflow() {
+  if (!audioInfo || !audioInfoTrack) return;
+  audioInfo.classList.remove('is-overflowing');
+  const overflows = audioInfoTrack.scrollWidth > audioInfo.clientWidth;
+  audioInfo.classList.toggle('is-overflowing', overflows);
+}
+
+if (audioInfo && audioInfoTrack) {
+  const titleObserver = new MutationObserver(() => {
+    window.requestAnimationFrame(updateTitleOverflow);
+  });
+  titleObserver.observe(audioInfoTrack, { childList: true, subtree: true, characterData: true });
+  window.addEventListener('resize', updateTitleOverflow);
+  window.requestAnimationFrame(updateTitleOverflow);
 }
 
 // --- Audio Control Functions ---
@@ -40,7 +81,10 @@ function updatePlayPauseButton() {
   const isPaused = !audioPlayer || audioPlayer.paused || audioPlayer.ended;
 
   playPauseBtn.textContent = isPaused ? '▶' : '❚❚';
-  playPauseBtn.title = isPaused ? 'Play' : 'Pause';
+  const actionLabel = isPaused ? 'Play' : 'Pause';
+  playPauseBtn.title = actionLabel;
+  playPauseBtn.setAttribute('aria-label', actionLabel);
+  playPauseBtn.dataset.tooltip = actionLabel;
 }
 
 function rewindAudio(seconds) {
@@ -82,11 +126,18 @@ if (seekBar) {
 }
 
 if (miniToggleBtn) {
-  miniToggleBtn.addEventListener('click', enterMiniMode);
+  miniToggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    enterMiniMode();
+  });
 }
 
 if (restoreBtn) {
-  restoreBtn.addEventListener('click', exitMiniMode);
+  restoreBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    exitMiniMode();
+  });
 }
 
 // --- Drag Functionality ---
