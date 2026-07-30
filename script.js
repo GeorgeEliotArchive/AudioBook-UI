@@ -165,12 +165,13 @@ function initializeResponsiveSidebar() {
   sidebar.style.width = `${getSidebarWidth()}px`;
 
   if (usesMobileSidebar()) {
-    // On phones, begin with the reading area unobstructed.
-    sidebar.classList.remove("open");
-    toggleButton.classList.remove("open");
+    // On phones, show the overlay drawer initially while keeping its close
+    // button visible at the drawer's right edge.
+    sidebar.classList.add("open");
+    toggleButton.classList.add("open");
     main.classList.remove("shifted");
     main.style.marginLeft = "0px";
-    toggleButton.style.transform = "translateX(0)";
+    toggleButton.style.transform = `translateX(${getSidebarWidth() - 48}px)`;
   }
 }
 
