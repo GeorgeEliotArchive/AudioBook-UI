@@ -129,6 +129,7 @@ p {
 
 .audio-widget-header {
   cursor: move;
+  touch-action: none;
   background-color: #a41e34;
   color: white;
   border-bottom: 1px solid #8c1a2b;
@@ -403,6 +404,7 @@ p {
 
   overflow: visible;                  
   resize: none;                       
+  touch-action: none;
 }
 
 /* Hide everything we don't want in mini mode */

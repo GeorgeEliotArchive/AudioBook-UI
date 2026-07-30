@@ -14,6 +14,11 @@ let isDragging = false;
 let offsetX = 0;
 let offsetY = 0;
 let normalWidgetSize = null;
+let activePointerId = null;
+let dragStartX = 0;
+let dragStartY = 0;
+let hasDragged = false;
+let suppressNextControlClick = false;
 
 // --- Mini-mode helpers ---
 function enterMiniMode() {
@@ -140,70 +145,80 @@ if (restoreBtn) {
   });
 }
 
-// --- Drag Functionality ---
+// --- Drag Functionality (mouse, touch, and stylus) ---
+function beginWidgetDrag(e) {
+  if (!audioWidget || !e.isPrimary || (e.pointerType === 'mouse' && e.button !== 0)) return;
 
-// Normal mode: drag by header
-if (audioWidgetHeader && audioWidget) {
-  audioWidgetHeader.addEventListener('mousedown', (e) => {
-    // Don't start drag when interacting with controls
-    if (e.target.closest('button, input[type="range"], select, label')) return;
+  const isMini = audioWidget.classList.contains('mini-mode');
+  if (!isMini && !e.target.closest('#audioWidgetHeader')) return;
+  if (!isMini && e.target.closest('button, input, select, label')) return;
+  if (isMini && e.target.closest('#restoreBtn')) return;
 
-    isDragging = true;
-    offsetX = e.clientX - audioWidget.offsetLeft;
-    offsetY = e.clientY - audioWidget.offsetTop;
+  const bounds = audioWidget.getBoundingClientRect();
+  activePointerId = e.pointerId;
+  dragStartX = e.clientX;
+  dragStartY = e.clientY;
+  offsetX = e.clientX - bounds.left;
+  offsetY = e.clientY - bounds.top;
+  hasDragged = false;
+  isDragging = true;
 
-    audioWidget.style.cursor = 'grabbing';
-    audioWidgetHeader.style.cursor = 'grabbing';
-
-    window.addEventListener('mousemove', onDragMouseMove);
-    window.addEventListener('mouseup', onDragMouseUp);
-  });
+  // Move with left/top coordinates after the first drag, regardless of the
+  // initial top/right CSS positioning.
+  audioWidget.style.left = `${bounds.left}px`;
+  audioWidget.style.top = `${bounds.top}px`;
+  audioWidget.style.right = 'auto';
+  audioWidget.style.bottom = 'auto';
+  audioWidget.setPointerCapture(e.pointerId);
 }
 
-// Mini mode: drag by the bubble itself (avoid play/restore clicks)
-if (audioWidget) {
-  audioWidget.addEventListener('mousedown', (e) => {
-    if (!audioWidget.classList.contains('mini-mode')) return;
+function moveWidget(e) {
+  if (!isDragging || !audioWidget || e.pointerId !== activePointerId) return;
 
-    // Still avoid dragging when clicking the buttons themselves
-    if (e.target.closest('button, input[type="range"], select, label')) return;
+  const distance = Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY);
+  if (!hasDragged && distance < 5) return;
 
-    isDragging = true;
-    offsetX = e.clientX - audioWidget.offsetLeft;
-    offsetY = e.clientY - audioWidget.offsetTop;
-
-    audioWidget.style.cursor = 'grabbing';
-
-    window.addEventListener('mousemove', onDragMouseMove);
-    window.addEventListener('mouseup', onDragMouseUp);
-  });
-}
-
-function onDragMouseMove(e) {
-  if (!isDragging || !audioWidget) return;
-
+  hasDragged = true;
   e.preventDefault();
 
-  const x = e.clientX - offsetX;
-  const y = e.clientY - offsetY;
+  const maxX = Math.max(0, window.innerWidth - audioWidget.offsetWidth);
+  const maxY = Math.max(0, window.innerHeight - audioWidget.offsetHeight);
+  const x = Math.min(maxX, Math.max(0, e.clientX - offsetX));
+  const y = Math.min(maxY, Math.max(0, e.clientY - offsetY));
 
   audioWidget.style.left = `${x}px`;
   audioWidget.style.top = `${y}px`;
+  audioWidget.style.cursor = 'grabbing';
 }
 
-function onDragMouseUp() {
-  if (!isDragging) return;
+function endWidgetDrag(e) {
+  if (!isDragging || !audioWidget || e.pointerId !== activePointerId) return;
+
+  if (audioWidget.hasPointerCapture(e.pointerId)) {
+    audioWidget.releasePointerCapture(e.pointerId);
+  }
+  suppressNextControlClick = hasDragged;
+  if (hasDragged) {
+    window.setTimeout(() => {
+      suppressNextControlClick = false;
+    }, 0);
+  }
   isDragging = false;
+  activePointerId = null;
+  audioWidget.style.cursor = '';
+}
 
-  if (audioWidget) {
-    audioWidget.style.cursor = '';
-  }
-  if (audioWidgetHeader) {
-    audioWidgetHeader.style.cursor = 'grab';
-  }
-
-  window.removeEventListener('mousemove', onDragMouseMove);
-  window.removeEventListener('mouseup', onDragMouseUp);
+if (audioWidget) {
+  audioWidget.addEventListener('pointerdown', beginWidgetDrag);
+  audioWidget.addEventListener('pointermove', moveWidget);
+  audioWidget.addEventListener('pointerup', endWidgetDrag);
+  audioWidget.addEventListener('pointercancel', endWidgetDrag);
+  audioWidget.addEventListener('click', (e) => {
+    if (!suppressNextControlClick) return;
+    suppressNextControlClick = false;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  }, true);
 }
 document.addEventListener("DOMContentLoaded", () => {
     const isMobileUA = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
