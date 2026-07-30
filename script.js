@@ -116,6 +116,28 @@ const nsResolver = function(prefix) {
   return ns[prefix] || null;
 };
 
+function findContentNode(targetId) {
+  if (!xmlDoc || !targetId) return null;
+
+  const nodeById = xmlDoc.evaluate(
+    `//*[@xml:id="${targetId}"]`,
+    xmlDoc,
+    nsResolver,
+    XPathResult.FIRST_ORDERED_NODE_TYPE,
+    null
+  ).singleNodeValue;
+
+  if (nodeById) return nodeById;
+
+  // Some source files contain a TOC target without the corresponding xml:id.
+  // Adam Bede targets #epilogue but stores the text in an <epilogue> element.
+  if (/^[A-Za-z][A-Za-z0-9_-]*$/.test(targetId)) {
+    return xmlDoc.querySelector(targetId);
+  }
+
+  return null;
+}
+
 // --- Core UI Functions ---
 function usesMobileSidebar() {
   return window.matchMedia("(max-width: 768px)").matches;
@@ -255,13 +277,7 @@ function parseXML(xmlString) {
             let bookTitle = book.textContent;
             let bookId = book.getAttribute("target");
             const standaloneId = bookId.replace("#", "");
-            const standaloneNode = xmlDoc.evaluate(
-                `//*[@xml:id="${standaloneId}"]`,
-                xmlDoc,
-                nsResolver,
-                XPathResult.FIRST_ORDERED_NODE_TYPE,
-                null
-            ).singleNodeValue;
+            const standaloneNode = findContentNode(standaloneId);
 
             // Some works end with a text-only top-level entry rather than
             // another numbered book. Middlemarch's FINALE is one such entry.
@@ -483,13 +499,7 @@ function loadChapterText(chapterId, element = null, titleOverride = null) {
     }
 
     // Find the element with the given xml:id
-    const chapterNode = xmlDoc.evaluate(
-        `//*[@xml:id="${chapterId}"]`,
-        xmlDoc,
-        nsResolver,
-        XPathResult.FIRST_ORDERED_NODE_TYPE,
-        null
-    ).singleNodeValue;
+    const chapterNode = findContentNode(chapterId);
 
     if (!content || !chapterNode) return;
 
