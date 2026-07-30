@@ -117,6 +117,16 @@ const nsResolver = function(prefix) {
 };
 
 // --- Core UI Functions ---
+function usesMobileSidebar() {
+  return window.matchMedia("(max-width: 768px)").matches;
+}
+
+function getSidebarWidth() {
+  return usesMobileSidebar()
+    ? Math.min(320, Math.max(240, window.innerWidth - 48))
+    : 350;
+}
+
 function toggleNav() {
   const sidebar = document.getElementById("mySidebar");
   const toggleButton = document.querySelector(".openbtn");
@@ -124,10 +134,8 @@ function toggleNav() {
 
   if (!sidebar || !toggleButton || !main) return;
 
-  // Check window width and adjust sidebar width
-  const screenWidth = window.innerWidth;
-  //console.log(screenWidth);
-  const sidebarWidth = screenWidth < 320 ? screenWidth - 30 + "px" : "350px";
+  const mobileLayout = usesMobileSidebar();
+  const sidebarWidth = `${getSidebarWidth()}px`;
 
   sidebar.style.width = sidebarWidth;
   
@@ -137,10 +145,33 @@ function toggleNav() {
   main.classList.toggle("shifted");
 
   // Adjust main margin dynamically
-  main.style.marginLeft = sidebar.classList.contains("open") ? sidebarWidth : "0px";
+  main.style.marginLeft = !mobileLayout && sidebar.classList.contains("open")
+    ? sidebarWidth
+    : "0px";
 
   // Adjust button position dynamically
-  toggleButton.style.transform = sidebar.classList.contains("open") ? `translateX(${sidebarWidth})` : "translateX(0)";
+  const buttonOffset = mobileLayout ? getSidebarWidth() - 48 : getSidebarWidth();
+  toggleButton.style.transform = sidebar.classList.contains("open")
+    ? `translateX(${buttonOffset}px)`
+    : "translateX(0)";
+}
+
+function initializeResponsiveSidebar() {
+  const sidebar = document.getElementById("mySidebar");
+  const toggleButton = document.querySelector(".openbtn");
+  const main = document.getElementById("main");
+  if (!sidebar || !toggleButton || !main) return;
+
+  sidebar.style.width = `${getSidebarWidth()}px`;
+
+  if (usesMobileSidebar()) {
+    // On phones, begin with the reading area unobstructed.
+    sidebar.classList.remove("open");
+    toggleButton.classList.remove("open");
+    main.classList.remove("shifted");
+    main.style.marginLeft = "0px";
+    toggleButton.style.transform = "translateX(0)";
+  }
 }
 
 
@@ -691,7 +722,25 @@ function goToIndex() {
 // --- Initial Setup ---
 // Set the dropdown to the stored/default value when the page loads
 document.addEventListener('DOMContentLoaded', async() => {
+    initializeResponsiveSidebar();
     await loadAudioIndex();
+});
+
+window.addEventListener('resize', () => {
+  const sidebar = document.getElementById("mySidebar");
+  const toggleButton = document.querySelector(".openbtn");
+  const main = document.getElementById("main");
+  if (!sidebar || !toggleButton || !main) return;
+
+  sidebar.style.width = `${getSidebarWidth()}px`;
+  const isOpen = sidebar.classList.contains("open");
+  main.style.marginLeft = !usesMobileSidebar() && isOpen
+    ? `${getSidebarWidth()}px`
+    : "0px";
+  const buttonOffset = usesMobileSidebar() ? getSidebarWidth() - 48 : getSidebarWidth();
+  toggleButton.style.transform = isOpen
+    ? `translateX(${buttonOffset}px)`
+    : "translateX(0)";
 });
 
 

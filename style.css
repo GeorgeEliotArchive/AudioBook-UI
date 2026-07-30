@@ -482,12 +482,26 @@ p {
   pointer-events: auto;
 }
 
-/* Media Queries */
-@media screen and (max-width: 320px) {
+/* Phone/tablet sidebar: overlay the page instead of pushing it off-screen. */
+@media screen and (max-width: 768px) {
   .sidebar {
-    width: calc(100vw - 30px);
+    width: min(320px, calc(100vw - 48px));
+    transform: translateX(-100%);
+    box-shadow: 4px 0 18px rgba(0,0,0,0.28);
   }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  #main,
   #main.shifted {
-    margin-left: calc(100vw - 30px);
+    margin-left: 0;
+  }
+
+  .openbtn {
+    top: 8px;
+    left: 8px;
+    z-index: 4;
   }
 }
